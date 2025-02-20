@@ -1,36 +1,16 @@
-const http = require("http")
-const url = require("url")
-const fs = require("fs/promises")
+const express = require("express");
+const app = express();
 
+let options = {
+  root: __dirname,
+};
 
-const hostname = "127.0.0.1";
-const port = 3000;
+app.get("/", (req, res) => res.sendFile("index.html", options));
+app.get("/about", (req, res) => res.sendFile("about.html", options));
+app.get("/contact-me", (req, res) => res.sendFile("contact-me.html", options));
+app.get("/*", (req, res) => res.sendFile("404.html", options));
 
-const server = http.createServer();
-
-server.on("request", async (req, res) => {
-  let q = url.parse(req.url, true);
-  let filename = q.pathname;
-
-  if (filename === "/") {
-    filename = "./index.html";
-  } else if (filename === "/about") {
-    filename = "./about.html";
-  } else if (filename === "/contact-me") {
-    filename = "./contact-me.html";
-  } else {
-    filename = "./404.html";
-  }
-
-  try {
-    const data = await fs.readFile(filename, { encoding: 'utf8' });
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-  } catch (err) {
-    console.error(err);
-  }
-});
-
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
 });
